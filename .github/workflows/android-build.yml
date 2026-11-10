@@ -1,0 +1,31 @@
+name: Generar APK MORDOKU
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preparar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Instalar Gradle
+        run: |
+          curl -L https://services.gradle.org/distributions/gradle-8.9-bin.zip -o gradle.zip
+          unzip -q gradle.zip
+          echo "$PWD/gradle-8.9/bin" >> "$GITHUB_PATH"
+      - name: Descomprimir proyecto
+        run: unzip -q MORDOKU_Misterio_A1_Android.zip
+      - name: Compilar APK
+        working-directory: MORDOKU_Misterio_A1
+        run: gradle assembleDebug
+      - name: Publicar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MORDOKU-A1-APK
+          path: MORDOKU_Misterio_A1/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
